@@ -11,7 +11,8 @@
 
 DHT dht(DHT_PIN, DHT_TYPE);
 
-const float TEMP_LIMIT = 30.0;
+const float TEMP_ON_LIMIT = 30.0;
+const float TEMP_OFF_LIMIT = 28.0;
 
 void setup() {
   Serial.begin(115200);
@@ -28,6 +29,7 @@ void setup() {
 void loop() {
 
   static unsigned long lastReadTime = 0;
+  static bool fanState = false;
 
   // Read sensors every 2 seconds
   if (millis() - lastReadTime < 2000) {
@@ -71,19 +73,36 @@ void loop() {
   Serial.print(soilMoisturePercent);
   Serial.println(" %");
 
-  // Automatic ventilation control
-  if (temperature > TEMP_LIMIT) {
+  // Automatic ventilation control using temperature hysteresis
+  if (temperature > TEMP_ON_LIMIT) {
+
+    fanState = true;
 
     digitalWrite(RELAY_PIN, RELAY_ON);
 
     Serial.println("High temperature detected");
     Serial.println("Ventilation Fan: ON");
 
-  } else {
+  } else if (temperature < TEMP_OFF_LIMIT) {
+
+    fanState = false;
 
     digitalWrite(RELAY_PIN, RELAY_OFF);
 
     Serial.println("Temperature normal");
     Serial.println("Ventilation Fan: OFF");
+
+  } else {
+
+    // Keep the previous fan state between 28°C and 30°C
+    if (fanState) {
+      digitalWrite(RELAY_PIN, RELAY_ON);
+      Serial.println("Temperature within hysteresis range");
+      Serial.println("Ventilation Fan: ON");
+    } else {
+      digitalWrite(RELAY_PIN, RELAY_OFF);
+      Serial.println("Temperature within hysteresis range");
+      Serial.println("Ventilation Fan: OFF");
+    }
   }
 }
