@@ -24,6 +24,14 @@ void setup() {
 
 void loop() {
 
+  static unsigned long lastReadTime = 0;
+
+  if (millis() - lastReadTime < 2000) {
+    return;
+  }
+
+  lastReadTime = millis();
+
   float temperature = dht.readTemperature();
   float humidity = dht.readHumidity();
 
