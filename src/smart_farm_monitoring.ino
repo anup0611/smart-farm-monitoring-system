@@ -24,11 +24,21 @@ void setup() {
 
 void loop() {
 
+  static unsigned long lastReadTime = 0;
+
+  // Read sensors every 2 seconds
+  if (millis() - lastReadTime < 2000) {
+    return;
+  }
+
+  lastReadTime = millis();
+
   float temperature = dht.readTemperature();
   float humidity = dht.readHumidity();
 
   int soilMoisture = analogRead(SOIL_PIN);
 
+  // Check whether DHT11 readings are valid
   if (isnan(temperature) || isnan(humidity)) {
     Serial.println("DHT11 sensor reading failed");
     delay(2000);
@@ -48,6 +58,7 @@ void loop() {
   Serial.print("Soil Moisture: ");
   Serial.println(soilMoisture);
 
+  // Automatic ventilation control
   if (temperature > TEMP_LIMIT) {
 
     digitalWrite(RELAY_PIN, LOW);
@@ -62,6 +73,4 @@ void loop() {
     Serial.println("Temperature normal");
     Serial.println("Ventilation Fan: OFF");
   }
-
-  delay(2000);
 }
