@@ -41,6 +41,12 @@ void loop() {
 
   int soilMoisture = analogRead(SOIL_PIN);
 
+  // Convert raw soil moisture value to approximate percentage
+  int soilMoisturePercent = map(soilMoisture, 1023, 0, 0, 100);
+
+  // Keep percentage within 0-100 range
+  soilMoisturePercent = constrain(soilMoisturePercent, 0, 100);
+
   // Check whether DHT11 readings are valid
   if (isnan(temperature) || isnan(humidity)) {
     Serial.println("DHT11 sensor reading failed");
@@ -58,8 +64,12 @@ void loop() {
   Serial.print(humidity);
   Serial.println(" %");
 
-  Serial.print("Soil Moisture: ");
+  Serial.print("Soil Moisture Raw: ");
   Serial.println(soilMoisture);
+
+  Serial.print("Soil Moisture: ");
+  Serial.print(soilMoisturePercent);
+  Serial.println(" %");
 
   // Automatic ventilation control
   if (temperature > TEMP_LIMIT) {
