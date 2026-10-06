@@ -6,6 +6,9 @@
 #define SOIL_PIN A0
 #define RELAY_PIN D1
 
+#define RELAY_ON LOW
+#define RELAY_OFF HIGH
+
 DHT dht(DHT_PIN, DHT_TYPE);
 
 const float TEMP_LIMIT = 30.0;
@@ -17,7 +20,7 @@ void setup() {
 
   pinMode(RELAY_PIN, OUTPUT);
 
-  digitalWrite(RELAY_PIN, HIGH);
+  digitalWrite(RELAY_PIN, RELAY_OFF);
 
   Serial.println("Smart Farm Monitoring System Started");
 }
@@ -61,14 +64,14 @@ void loop() {
   // Automatic ventilation control
   if (temperature > TEMP_LIMIT) {
 
-    digitalWrite(RELAY_PIN, LOW);
+    digitalWrite(RELAY_PIN, RELAY_ON);
 
     Serial.println("High temperature detected");
     Serial.println("Ventilation Fan: ON");
 
   } else {
 
-    digitalWrite(RELAY_PIN, HIGH);
+    digitalWrite(RELAY_PIN, RELAY_OFF);
 
     Serial.println("Temperature normal");
     Serial.println("Ventilation Fan: OFF");
